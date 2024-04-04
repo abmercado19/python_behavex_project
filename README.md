@@ -11,8 +11,8 @@
   - Open a command line in a folder where you want to store the testing solution and clone the python_framework_test solution
     (You can find the command in github)
 
-### For this example, the following environment variables need to be set: APP_URL, USER_NAME and USER_PASSWORD (The testing user
-should be already created. Once you create a testing user, use this user name and password to set the variables.
+### For this example, the following environment variables need to be set: APP_URL, USER_NAME and USER_PASSWORD 
+(The testing user should be already created. Once you create a testing user, use this user name and password to set the variables.)
 
 For environment variables, duplicate .env-sample and rename it to .env. Then edit the .env file with your own values.
 
