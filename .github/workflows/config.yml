@@ -6,6 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      APP_URL: "https://demoqa.com/"
+      USER_NAME: abmercado19
+      USER_PASSWORD: ${{ secrets.PASSWORD }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
