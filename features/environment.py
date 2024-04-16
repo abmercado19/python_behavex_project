@@ -4,6 +4,7 @@ import os
 from behavex_images import extend_environment as bxi_env
 from behaving.web import environment as bng_env
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def before_all(context):
@@ -32,6 +33,7 @@ def before_all(context):
         context.selected_browser = context.config.userdata.get('browser', 'chrome')
     if context.selected_browser in ('firefox', 'chrome'):
         context.default_browser = context.selected_browser
+        logging.info("Selected browser: {}".format(context.selected_browser))
     else:
         logging.info(
             '\n-----------------------------\n'
