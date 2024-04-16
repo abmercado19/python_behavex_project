@@ -129,6 +129,9 @@ def run_browser_headless_mode(context):
     else:
         options = set_browser_options(context.default_browser)
     options.add_argument("--headless")
+    disable_dev_shm_usage = context.config.userdata.get("disable_dev_shm_usage", 'false')
+    if disable_dev_shm_usage == "true":
+        options.add_argument('--disable-dev-shm-usage')
     context.browser_args["options"] = options
 
 
@@ -137,6 +140,9 @@ def run_browser_non_headless_mode(context):
         options = context.browser_args["options"]
     else:
         options = set_browser_options(context.default_browser)
+    disable_dev_shm_usage = context.config.userdata.get("disable_dev_shm_usage", 'false')
+    if disable_dev_shm_usage == "true":
+        options.add_argument('--disable-dev-shm-usage')
     context.browser_args["options"] = options
 
 
