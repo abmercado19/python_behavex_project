@@ -32,3 +32,15 @@ jobs:
       - name: Run tests
         run: |
           pipenv run behavex -D browser=chrome -D headless_browser=true --define BASE_URL="${BASE_URL}" --define USERNAME="${USERNAME}" --define PASSWORD="${PASSWORD}" -D browser=chrome -D headless_browser=true
+
+      - name: Store Behave Test Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: behave-results
+          path: output/behave
+
+      - name: Store All Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-artifacts
+          path: output
