@@ -29,9 +29,17 @@ jobs:
         run: |
           pipenv install --dev  # Install dependencies from Pipfile.lock
 
-      - name: Run tests
+      - name: Run tests with Chrome
+        env:
+          BROWSER: chrome
         run: |
-          pipenv run behavex -D browser=chrome -D headless_browser=true --define BASE_URL="${BASE_URL}" --define USERNAME="${USERNAME}" --define PASSWORD="${PASSWORD}" -D browser=chrome -D headless_browser=true
+          pipenv run behavex -D browser="$BROWSER" -D headless_browser=true --define BASE_URL="${BASE_URL}" --define USERNAME="${USERNAME}" --define PASSWORD="${PASSWORD}"
+
+      - name: Run tests with Firefox
+        env:
+          BROWSER: firefox
+        run: |
+          pipenv run behavex -D browser="$BROWSER" -D headless_browser=true --define BASE_URL="${BASE_URL}" --define USERNAME="${USERNAME}" --define PASSWORD="${PASSWORD}"
 
       - name: Store Behave Test Results
         if: always()

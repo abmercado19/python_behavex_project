@@ -129,9 +129,6 @@ def run_browser_headless_mode(context):
     else:
         options = set_browser_options(context.default_browser)
     options.add_argument("--headless")
-    disable_dev_shm_usage = context.config.userdata.get("disable_dev_shm_usage", 'false')
-    if disable_dev_shm_usage == "true":
-        options.add_argument('--disable-dev-shm-usage')
     context.browser_args["options"] = options
 
 
@@ -140,26 +137,14 @@ def run_browser_non_headless_mode(context):
         options = context.browser_args["options"]
     else:
         options = set_browser_options(context.default_browser)
-    disable_dev_shm_usage = context.config.userdata.get("disable_dev_shm_usage", 'false')
-    if disable_dev_shm_usage == "true":
-        options.add_argument('--disable-dev-shm-usage')
     context.browser_args["options"] = options
 
 
 def set_browser_options(browser):
     if 'chrome' in browser:
-        get_chrome_driver()
         options = webdriver.ChromeOptions()
     elif 'firefox' in browser:
         options = webdriver.FirefoxOptions()
     else:
         raise Exception("Default browser is not valid. Valid options: Chrome or Firefox")
     return options
-
-
-def get_chrome_driver():
-    try:
-        chrome_orig_path = ChromeDriverManager(path=os.path.dirname(sys.executable)).install()
-        os.environ["PATH"] += os.pathsep + os.path.dirname(chrome_orig_path)
-    except:
-        print("It was not possible to download the Chrome driver. Trying to use the one already installed...")
