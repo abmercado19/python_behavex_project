@@ -9,7 +9,7 @@ jobs:
     env:
       APP_URL: "https://demoqa.com/"
       USER_NAME: abmercado19
-      USER_PASSWORD: ${{ secrets.PASSWORD }}
+      USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
 
     steps:
       - name: Checkout code
@@ -31,4 +31,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pipenv run behavex
+          pipenv run behavex --define BASE_URL="${BASE_URL}" --define USERNAME="${USERNAME}" --define PASSWORD="${PASSWORD}"
