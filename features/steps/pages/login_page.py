@@ -27,13 +27,12 @@ class LoginPage(BasePage):
         user_name_field.send_keys(user_name)
 
     def complete_user_password_field(self, user_password):
-        user_password_field = self.web_utils.find_element(
-            *self.user_password_text_field
-        )
+        user_password_field = self.web_utils.find_element(*self.user_password_text_field)
         user_password_field.send_keys(user_password)
 
     def click_login_button(self):
         login_button = self.web_utils.find_element(*self.login_button)
+        self.web_utils.move_to(login_button)
         login_button.click()
         self.web_utils.wait_element_to_hide(*self.loading_message)
         from features.steps.pages.profile_page import ProfilePage
