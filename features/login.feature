@@ -2,6 +2,7 @@
 Feature: Login
   # This feature is going to be used for all the tests related to login and creation of new accounts
 
+  @LOGIN
   Scenario: I can login into the Tools QA page with an existing user and correct password
     Given I open the Tools QA page
     When I complete the user name field with testing user name
