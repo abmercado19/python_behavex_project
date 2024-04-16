@@ -4,6 +4,7 @@ import os
 from behavex_images import extend_environment as bxi_env
 from behaving.web import environment as bng_env
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def before_all(context):
@@ -32,6 +33,7 @@ def before_all(context):
         context.selected_browser = context.config.userdata.get('browser', 'chrome')
     if context.selected_browser in ('firefox', 'chrome'):
         context.default_browser = context.selected_browser
+        logging.info("Selected browser: {}".format(context.selected_browser))
     else:
         logging.info(
             '\n-----------------------------\n'
@@ -140,9 +142,18 @@ def run_browser_non_headless_mode(context):
 
 def set_browser_options(browser):
     if 'chrome' in browser:
+        get_chrome_driver()
         options = webdriver.ChromeOptions()
     elif 'firefox' in browser:
         options = webdriver.FirefoxOptions()
     else:
         raise Exception("Default browser is not valid. Valid options: Chrome or Firefox")
     return options
+
+
+def get_chrome_driver():
+    try:
+        chrome_orig_path = ChromeDriverManager(path=os.path.dirname(sys.executable)).install()
+        os.environ["PATH"] += os.pathsep + os.path.dirname(chrome_orig_path)
+    except:
+        print("It was not possible to download the Chrome driver. Trying to use the one already installed...")
