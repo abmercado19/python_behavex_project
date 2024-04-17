@@ -1,4 +1,6 @@
-""" This file is used to store all the common methods related to the env configuration """
+"""
+This file is used to store all the common methods related to the env configuration
+"""
 
 
 def get_app_url(context):

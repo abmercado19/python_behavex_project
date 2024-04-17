@@ -1,3 +1,11 @@
+"""
+Base Page Class for Page Object Model (POM)
+
+It encapsulates common functionality and utilities used across multiple pages in the application.
+The other page object classes should inherit from this class.
+
+"""
+
 from features.steps.pages.web_utils import WebUtils
 
 

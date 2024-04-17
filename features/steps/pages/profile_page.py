@@ -1,3 +1,7 @@
+"""
+This page object contains the elements locators and methods related to the Profile page
+"""
+
 from selenium.webdriver.common.by import By
 
 from features.steps.pages.base_page import BasePage
