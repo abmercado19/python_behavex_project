@@ -4,7 +4,6 @@ import os
 from behavex_images import extend_environment as bxi_env
 from behaving.web import environment as bng_env
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 def before_all(context):

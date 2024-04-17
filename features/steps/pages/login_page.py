@@ -1,3 +1,7 @@
+"""
+This page object contains the elements locators and methods related to the Login page
+"""
+
 import logging
 from urllib.parse import urljoin
 

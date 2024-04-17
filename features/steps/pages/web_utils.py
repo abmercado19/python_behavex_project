@@ -26,19 +26,14 @@ Class:
            - wait_element_to_hide
            - wait_for_element_to_be_clickable
            - move_to
-           - scroll_to_bottom_of_element
            - mouse_hover
-           - mouse_hover_with_offset
-           - is_element_displayed
            - highlight
 """
 # pylint: disable=W0703
 import logging
-import os
 import time
 
 import selenium.webdriver.support.ui as ui
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exp_cond
@@ -52,23 +47,14 @@ class WebUtils(object):
 
     def __init__(self, driver):
         self.driver = driver
-        if not os.environ.get("CIRCLE_JOB", None):
-            self.highlight_elements = True
+        self.highlight_elements = True
 
     def get(self, url):
         """Go to the specified url"""
         self.driver.get(url)
 
     # pylint: disable=R0913
-    def find_element(
-        self,
-        by_locator,
-        locator,
-        wait=1,
-        retries=10,
-        wait_for_clickable=True,
-        log_errors=True,
-    ):
+    def find_element(self, by_locator, locator, wait=1, retries=10, wait_for_clickable=True, log_errors=True,):
         """Retrieves the first element found in driver's current page
         based on a specified locator, considering retry intervals
         to properly deal with page loading times"""
@@ -76,42 +62,27 @@ class WebUtils(object):
         if by_locator == By.LINK_TEXT:
             element = self.find_element_by_link_text(locator, wait, retries, log_errors)
         elif by_locator == By.ID:
-            element = self.find_element_by_id(
-                locator, wait, retries, wait_for_clickable, log_errors
-            )
+            element = self.find_element_by_id(locator, wait, retries, wait_for_clickable, log_errors)
         elif by_locator == By.NAME:
-            element = self.find_element_by_name(
-                locator, wait, retries, wait_for_clickable, log_errors
-            )
+            element = self.find_element_by_name(locator, wait, retries, wait_for_clickable, log_errors)
         elif by_locator == By.XPATH:
-            element = self.find_element_by_xpath(
-                locator, wait, retries, wait_for_clickable, log_errors
-            )
+            element = self.find_element_by_xpath(locator, wait, retries, wait_for_clickable, log_errors)
         elif by_locator == By.CLASS_NAME:
-            element = self.find_element_by_class_name(
-                locator, wait, retries, wait_for_clickable, log_errors
-            )
+            element = self.find_element_by_class_name(locator, wait, retries, wait_for_clickable, log_errors)
         elif by_locator == By.PARTIAL_LINK_TEXT:
-            element = self.find_element_by_partial_link_text(
-                locator, wait, retries, log_errors
-            )
+            element = self.find_element_by_partial_link_text(locator, wait, retries, log_errors)
         elif by_locator == By.CSS_SELECTOR:
             locator = locator.replace('"', "'").replace("'", "'").replace("\\'", "'")
-            element = self.find_element_by_css_selector(
-                locator, wait, retries, wait_for_clickable, log_errors
-            )
+            element = self.find_element_by_css_selector(locator, wait, retries, wait_for_clickable, log_errors)
         else:
             for i in range(retries):
                 try:
                     element = self.driver.find_element(by_locator, locator, log_errors)
                     break
                 except Exception as exception:
-                    message = (
-                        "Unable to find element with {}: '{}'."
-                        " Retry number: {} out of {}.".format(
-                            by_locator, locator, str(i + 1), str(retries)
-                        )
-                    )
+                    message = ("Unable to find element with {}: '{}'."
+                               "Retry number: {} out of {}.".format(by_locator, locator, str(i + 1),
+                                                                    str(retries)))
                     if (i + 1) == retries:
                         raise exception
                     elif log_errors:
@@ -130,35 +101,26 @@ class WebUtils(object):
         elif by_locator == By.XPATH:
             elements = self.find_elements_by_xpath(locator, wait, retries, log_errors)
         elif by_locator == By.CLASS_NAME:
-            elements = self.find_elements_by_class_name(
-                locator, wait, retries, log_errors
-            )
+            elements = self.find_elements_by_class_name(locator, wait, retries, log_errors)
         elif by_locator == By.CSS_SELECTOR:
             locator = locator.replace('"', "'").replace("'", "'").replace("\\'", "'")
-            elements = self.find_elements_by_css_selector(
-                locator, wait, retries, log_errors
-            )
+            elements = self.find_elements_by_css_selector(locator, wait, retries, log_errors)
         else:
             for i in range(retries):
                 try:
                     elements = self.driver.find_elements(by_locator, locator)
                     break
                 except Exception as exception:
-                    message = (
-                        "Unable to find element with {}: '{}'."
-                        " Retry number: {} out of {}.".format(
-                            by_locator, locator, str(i + 1), str(retries)
-                        )
-                    )
+                    message = ("Unable to find element with {}: '{}'."
+                               "Retry number: {} out of {}.".format(by_locator, locator,
+                                                                    str(i + 1), str(retries)))
                     if (i + 1) == retries:
                         raise exception
                     elif log_errors:
                         logging.info(message)
         return elements
 
-    def find_element_by_id(
-        self, element_id, wait=2, retries=8, wait_for_clickable=True, log_errors=True
-    ):
+    def find_element_by_id(self, element_id, wait=2, retries=8, wait_for_clickable=True, log_errors=True):
         """Retrieves a web element using the ID locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -168,24 +130,16 @@ class WebUtils(object):
                 if wait_for_clickable:
                     # so it could still exist but if it isn't enabled- won't
                     # show :-/
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.ID, element_id))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.ID, element_id)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.presence_of_element_located((By.ID, element_id))
-                    )
+                    elem = wd_wait.until(exp_cond.presence_of_element_located((By.ID, element_id)))
                     elem = self.driver.find_element(By.ID, element_id)
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with id: '{}'. "
-                    "Retry number: {} out of {}.".format(
-                        element_id, str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with id: '{}'. "
+                           "Retry number: {} out of {}.".format(element_id, str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -199,26 +153,18 @@ class WebUtils(object):
         for i in range(retries):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
-                elements = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located((By.ID, element_id))
-                )
+                elements = wd_wait.until(exp_cond.presence_of_all_elements_located((By.ID, element_id)))
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find elements with id: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        element_id, str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find elements with id: '{}'."
+                           "Retry number: {} out of {}.".format(element_id, str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elements
 
-    def find_element_by_name(
-        self, name, wait=1, retries=8, wait_for_clickable=True, log_errors=True
-    ):
+    def find_element_by_name(self, name, wait=1, retries=8, wait_for_clickable=True, log_errors=True):
         """Retrieves a web element using the NAME locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -228,24 +174,16 @@ class WebUtils(object):
                 if wait_for_clickable:
                     # so it could still exist but if it isn't enabled- won't
                     # show :-/
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.NAME, name))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.NAME, name)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.presence_of_element_located((By.NAME, name))
-                    )
+                    elem = wd_wait.until(exp_cond.presence_of_element_located((By.NAME, name)))
                     elem = self.driver.find_element(By.NAME, name)
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with name: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        name, str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with name: '{}'."
+                           "Retry number: {} out of {}.".format(name, str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -259,26 +197,18 @@ class WebUtils(object):
         for i in range(retries):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
-                elements = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located((By.NAME, name))
-                )
+                elements = wd_wait.until(exp_cond.presence_of_all_elements_located((By.NAME, name)))
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find elements with name: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        name, str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find elements with name: '{}'."
+                           "Retry number: {} out of {}.".format(name, str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elements
 
-    def find_element_by_xpath(
-        self, xpath, wait=10, retries=8, wait_for_clickable=True, log_errors=True
-    ):
+    def find_element_by_xpath(self, xpath, wait=10, retries=8, wait_for_clickable=True, log_errors=True):
         """Retrieves a web element using the XPATH locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -288,24 +218,16 @@ class WebUtils(object):
                 if wait_for_clickable:
                     # so it could still exist but if it isn't enabled- won't
                     # show :-/
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.XPATH, xpath))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.XPATH, xpath)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.presence_of_element_located((By.XPATH, xpath))
-                    )
+                    elem = wd_wait.until(exp_cond.presence_of_element_located((By.XPATH, xpath)))
                     elem = self.driver.find_element(By.XPATH, xpath)
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with xpath: '{}'. "
-                    "Retry number: {} out of {}.".format(
-                        xpath.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with xpath: '{}'. "
+                           "Retry number: {} out of {}.".format(xpath.encode("utf8"), str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -319,26 +241,18 @@ class WebUtils(object):
         for i in range(retries):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
-                elements = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located((By.XPATH, xpath))
-                )
+                elements = wd_wait.until(exp_cond.presence_of_all_elements_located((By.XPATH, xpath)))
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with xpath: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        xpath.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with xpath: '{}'."
+                           "Retry number: {} out of {}.".format(xpath.encode("utf8"), str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elements
 
-    def find_element_by_css_selector(
-        self, css, wait=1, retries=8, wait_for_clickable=True, log_errors=True
-    ):
+    def find_element_by_css_selector(self, css, wait=1, retries=8, wait_for_clickable=True, log_errors=True):
         """Retrieves a web element using the CSS selector locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -348,24 +262,16 @@ class WebUtils(object):
                 if wait_for_clickable:
                     # so it could still exist but if it isn't enabled- won't
                     # show :-/
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.CSS_SELECTOR, css))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.CSS_SELECTOR, css)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.presence_of_element_located((By.CSS_SELECTOR, css))
-                    )
+                    elem = wd_wait.until(exp_cond.presence_of_element_located((By.CSS_SELECTOR, css)))
                     elem = self.driver.find_element(By.CSS_SELECTOR, css)
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with css selector: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        css.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with css selector: '{}'."
+                           "Retry number: {} out of {}.".format(css.encode("utf8"), str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -379,26 +285,18 @@ class WebUtils(object):
         for i in range(retries):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
-                elements = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located((By.CSS_SELECTOR, css))
-                )
+                elements = wd_wait.until(exp_cond.presence_of_all_elements_located((By.CSS_SELECTOR, css)))
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with css selector: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        css.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with css selector: '{}'."
+                           "Retry number: {} out of {}.".format(css.encode("utf8"), str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elements
 
-    def find_element_by_class_name(
-        self, class_name, wait=1, retries=8, wait_for_clickable=True, log_errors=True
-    ):
+    def find_element_by_class_name(self, class_name, wait=1, retries=8, wait_for_clickable=True, log_errors=True):
         """Retrieves a web element using the CLASS NAME locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -408,63 +306,45 @@ class WebUtils(object):
                 if wait_for_clickable:
                     # so it could still exist but if it isn't enabled- won't
                     # show :-/
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.CLASS_NAME, class_name))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.CLASS_NAME, class_name)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.presence_of_element_located(
-                            (By.CLASS_NAME, class_name)
-                        )
-                    )
+                    elem = wd_wait.until(exp_cond.presence_of_element_located((By.CLASS_NAME, class_name)))
                     elem = self.driver.find_element(By.CLASS_NAME, class_name)
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with class name: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        class_name.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with class name: '{}'."
+                           "Retry number: {} out of {}.".format(class_name.encode("utf8"),
+                                                                str(i + 1),
+                                                                str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elem
 
-    def find_elements_by_class_name(
-        self, class_name, wait=1, retries=8, log_errors=True
-    ):
+    def find_elements_by_class_name(self, class_name, wait=1, retries=8, log_errors=True):
         """Retrieves all web elements found using the CLASS NAME locator.
         Retries are implemented to properly deal with page loading times"""
         elements = None
         for i in range(retries):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
-                elements = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located(
-                        (By.CLASS_NAME, class_name)
-                    )
-                )
+                elements = wd_wait.until(exp_cond.presence_of_all_elements_located((By.CLASS_NAME, class_name)))
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with css selector: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        class_name.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with css selector: '{}'."
+                           "Retry number: {} out of {}.".format(class_name.encode("utf8"),
+                                                                str(i + 1),
+                                                                str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
                     logging.info(message)
         return elements
 
-    def find_element_by_partial_link_text(
-        self, partial_link_text, wait=1, retries=8, log_errors=True
-    ):
+    def find_element_by_partial_link_text(self, partial_link_text, wait=1, retries=8, log_errors=True):
         """Retrieves a web element using the CLASS NAME locator.
         Retries are implemented to properly deal with page loading times"""
         elem = None
@@ -472,26 +352,16 @@ class WebUtils(object):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
                 elem = wd_wait.until(
-                    exp_cond.presence_of_all_elements_located(
-                        (By.PARTIAL_LINK_TEXT, partial_link_text)
-                    )
-                    and exp_cond.visibility_of_element_located(
-                        (By.PARTIAL_LINK_TEXT, partial_link_text)
-                    )
-                    and exp_cond.element_to_be_clickable(
-                        (By.PARTIAL_LINK_TEXT, partial_link_text)
-                    )
-                )
+                    exp_cond.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, partial_link_text))
+                    and exp_cond.visibility_of_element_located((By.PARTIAL_LINK_TEXT, partial_link_text))
+                    and exp_cond.element_to_be_clickable((By.PARTIAL_LINK_TEXT, partial_link_text)))
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with partial link text containing: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        partial_link_text.encode("utf8"), str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with partial link text containing: '{}'."
+                           "Retry number: {} out of {}.".format(partial_link_text.encode("utf8"), str(i + 1),
+                                                                str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -506,25 +376,15 @@ class WebUtils(object):
             try:
                 wd_wait = ui.WebDriverWait(self.driver, int(wait))
                 if i % 2 == 0:
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable((By.LINK_TEXT, text))
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.LINK_TEXT, text)))
                 else:
-                    elem = wd_wait.until(
-                        exp_cond.element_to_be_clickable(
-                            (By.XPATH, "//a[text()='" + text + "']")
-                        )
-                    )
+                    elem = wd_wait.until(exp_cond.element_to_be_clickable((By.XPATH, "//a[text()='" + text + "']")))
                 if self.highlight_elements:
                     highlight(elem)
                 break
             except Exception as exception:
-                message = (
-                    "Unable to find element with link text: '{}'."
-                    " Retry number: {} out of {}.".format(
-                        text, str(i + 1), str(retries)
-                    )
-                )
+                message = ("Unable to find element with link text: '{}'. "
+                           "Retry number: {} out of {}.".format(text, str(i + 1), str(retries)))
                 if (i + 1) == retries:
                     raise exception
                 elif log_errors:
@@ -545,61 +405,19 @@ class WebUtils(object):
         for i in range(retries):
             # noinspection PyBroadException
             try:
-                ui.WebDriverWait(self.driver, wait).until(
-                    exp_cond.element_to_be_clickable((by_locator, locator))
-                )
+                ui.WebDriverWait(self.driver, wait).until(exp_cond.element_to_be_clickable((by_locator, locator)))
             except:
                 return
         raise Exception("Element is not clickable: {}:{}".format(by_locator, locator))
 
     def move_to(self, element, x_offset=0, y_offset=0, show_element_at_top=True):
         show_at_top = "true" if show_element_at_top else "false"
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({});".format(show_at_top), element
-        )
+        self.driver.execute_script("arguments[0].scrollIntoView({});".format(show_at_top), element)
         self.mouse_hover(element, x_offset, y_offset)
-
-    def scroll_to_bottom_of_element(self, element):
-        logging.info("Scrolling to top of element")
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({alignToTop : 'false'});", element
-        )
-        time.sleep(1)
-
-    def perform_table_scroll_left(
-        self,
-        scrolling_area_by_locator,
-        scrolling_area_locator,
-        offset=0,
-    ):
-        scrolling_area_elem = self.find_elements(
-            scrolling_area_by_locator, scrolling_area_locator
-        )[-1]
-        self.mouse_hover(scrolling_area_elem)
-        if offset == 0:
-            self.driver.execute_script(
-                "arguments[0].scrollLeft -= arguments[0].scrollWidth",
-                scrolling_area_elem,
-            )
-        else:
-            self.driver.execute_script(
-                "arguments[0].scrollLeft -= {}".format(offset), scrolling_area_elem
-            )
 
     def mouse_hover(self, element, x_offset=0, y_offset=0):
         actions = ActionChains(self.driver)
         actions.move_to_element(element).move_by_offset(x_offset, y_offset).perform()
-
-    def mouse_hover_with_offset(self, element, x_offset=0, y_offset=0):
-        actions = ActionChains(self.driver)
-        actions.move_to_element_with_offset(element, x_offset, y_offset).perform()
-
-    def is_element_displayed(self, element_locator):
-        try:
-            is_displayed = self.driver.find_element(*element_locator).is_displayed()
-        except NoSuchElementException:
-            is_displayed = False
-        return is_displayed
 
 
 def highlight(element, color="blue", border=3):
@@ -608,8 +426,6 @@ def highlight(element, color="blue", border=3):
     driver = element._parent
 
     def apply_style(s):
-        driver.execute_script(
-            "arguments[0].setAttribute('style', arguments[1]);", element, s
-        )
+        driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", element, s)
 
     apply_style("border: {0}px solid {1};".format(border, color))
